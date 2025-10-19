@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Todo List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tasks"></i> Flask Todo List</h1>
+            <p>Organize your tasks with Python Flask</p>
+        </div>
+
+        <div class="input-section">
+            <form action="{{ url_for('add_todo') }}" method="POST">
+                <input type="text" name="title" placeholder="Enter a new task..." required>
+                <button type="submit"><i class="fas fa-plus"></i> Add Task</button>
+            </form>
+        </div>
+
+        <div class="filters">
+            <a href="/" class="filter-btn active">All Tasks</a>
+            <span class="stats">{{ todos|length }} total tasks</span>
+        </div>
+
+        <div class="tasks">
+            {% if todos %}
+                {% for todo in todos %}
+                <div class="task {% if todo.completed %}completed{% endif %}">
+                    <div class="task-content">
+                        <a href="{{ url_for('complete_todo', todo_id=todo.id) }}" class="task-check">
+                            <i class="fas fa-{% if todo.completed %}check-circle{% else %}circle{% endif %}"></i>
+                        </a>
+                        <span class="task-text">{{ todo.title }}</span>
+                        <div class="task-actions">
+                            <span class="task-date">{{ todo.created_at }}</span>
+                            <a href="{{ url_for('delete_todo', todo_id=todo.id) }}" class="task-delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>No tasks yet. Add a task to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p>Built with Python Flask | <a href="/api/todos">View API</a></p>
+        </div>
+    </div>
+</body>
+</html>

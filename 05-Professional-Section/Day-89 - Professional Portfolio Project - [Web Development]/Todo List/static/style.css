@@ -1,0 +1,258 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.header {
+    background: #6a11cb;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.input-section {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.input-section form {
+    display: flex;
+    gap: 0;
+}
+
+.input-section input {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px 0 0 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-section input:focus {
+    border-color: #6a11cb;
+}
+
+.input-section button {
+    padding: 14px 20px;
+    background: #6a11cb;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.input-section button:hover {
+    background: #550bac;
+}
+
+.filters {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    background: #6a11cb;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.stats {
+    padding: 8px 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+.tasks {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.task {
+    margin-bottom: 12px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s;
+    transition: transform 0.3s;
+}
+
+.task:hover {
+    transform: translateY(-2px);
+}
+
+.task.completed {
+    background: #f8f9fa;
+}
+
+.task.completed .task-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.task-content {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.task-check {
+    margin-right: 15px;
+    font-size: 22px;
+    color: #ddd;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.task-check:hover {
+    color: #6a11cb;
+}
+
+.task-check .fa-check-circle {
+    color: #6a11cb;
+}
+
+.task-text {
+    flex: 1;
+    font-size: 16px;
+    word-break: break-word;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.task-date {
+    font-size: 12px;
+    color: #999;
+}
+
+.task-delete {
+    color: #ff4757;
+    text-decoration: none;
+    font-size: 18px;
+    transition: transform 0.3s;
+}
+
+.task-delete:hover {
+    transform: scale(1.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 60px;
+    margin-bottom: 15px;
+    color: #ddd;
+}
+
+.empty-state p {
+    font-size: 16px;
+}
+
+.footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    border-top: 1px solid #eee;
+}
+
+.footer a {
+    color: #6a11cb;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .container {
+        border-radius: 12px;
+    }
+
+    .header {
+        padding: 20px 15px;
+    }
+
+    .input-section form {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .input-section input {
+        border-radius: 8px;
+    }
+
+    .input-section button {
+        border-radius: 8px;
+    }
+
+    .task-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .task-actions {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+}
