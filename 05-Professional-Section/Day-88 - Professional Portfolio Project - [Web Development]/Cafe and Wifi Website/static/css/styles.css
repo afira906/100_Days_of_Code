@@ -1,0 +1,177 @@
+:root {
+    --primary-color: #8B4513;
+    --secondary-color: #D2691E;
+    --accent-color: #A0522D;
+    --light-brown: #F5F1E8;
+    --dark-brown: #4E342E;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-brown);
+}
+
+/* Navigation */
+.navbar {
+    background: linear-gradient(135deg, var(--dark-brown) 0%, var(--primary-color) 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(rgba(78, 52, 46, 0.8), rgba(139, 69, 19, 0.8)),
+                url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2078&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 76px;
+}
+
+/* Cards */
+.cafe-card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.cafe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+    border-radius: 15px 15px 0 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding: 1rem 1.5rem;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 69, 19, 0.4);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    border-radius: 20px;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Form Styles */
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.amenities .badge.bg-success { /* WiFi */
+    background: linear-gradient(135deg, #5D4037 0%, #8B4513 100%) !important;
+    color: white;
+}
+
+.amenities .badge.bg-primary { /* Sockets */
+    background: linear-gradient(135deg, #6D4C41 0%, #A0522D 100%) !important;
+    color: white;
+}
+
+.amenities .badge.bg-info { /* Toilet */
+    background: linear-gradient(135deg, #8D6E63 0%, #BC8F8F 100%) !important;
+    color: white;
+}
+
+.amenities .badge.bg-warning { /* Calls */
+    background: linear-gradient(135deg, #A1887F 0%, #D7CCC8 100%) !important;
+    color: #5D4037;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Alert Messages */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+        padding: 120px 0 60px;
+        min-height: auto;
+    }
+
+    .display-4 {
+        font-size: 2.5rem;
+    }
+
+    .cafe-card {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cafe-card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
