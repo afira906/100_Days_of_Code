@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dangerous Writing App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-skull-crossbones"></i> Dangerous Writing App</h1>
+            <p>If you stop typing for more than 5 seconds, all your progress will be lost!</p>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer" id="timer">5</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="text-area-container">
+            <textarea id="textArea" placeholder="Start typing here... Don't stop!"></textarea>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="wordCount">0</div>
+                <div class="stat-label">Words</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="charCount">0</div>
+                <div class="stat-label">Characters</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="timeCount">0</div>
+                <div class="stat-label">Seconds</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="saveBtn"><i class="fas fa-download"></i> Download Text</button>
+            <button id="newSessionBtn"><i class="fas fa-trash"></i> New Session</button>
+        </div>
+
+        <div class="warning-message" id="warningMessage">
+            Warning: Keep typing or you'll lose everything!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const textArea = document.getElementById('textArea');
+            const timer = document.getElementById('timer');
+            const progressBar = document.getElementById('progressBar');
+            const wordCount = document.getElementById('wordCount');
+            const charCount = document.getElementById('charCount');
+            const timeCount = document.getElementById('timeCount');
+            const saveBtn = document.getElementById('saveBtn');
+            const newSessionBtn = document.getElementById('newSessionBtn');
+            const warningMessage = document.getElementById('warningMessage');
+
+            // Variables
+            let countdown;
+            let timeLeft = 5;
+            let totalTime = 0;
+            let timerInterval;
+            let lastContent = '';
+
+            // Initialize
+            resetTimer();
+            startTimer();
+            updateStats();
+            checkServerActivity();
+
+            // Event Listeners
+            textArea.addEventListener('input', function() {
+                resetTimer();
+                updateStats();
+                saveToServer();
+            });
+
+            textArea.addEventListener('keydown', function() {
+                warningMessage.classList.remove('show');
+            });
+
+            saveBtn.addEventListener('click', function() {
+                window.location.href = "{{ url_for('download_content') }}";
+            });
+
+            newSessionBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to start a new session? All current text will be lost.')) {
+                    textArea.value = '';
+                    resetTimer();
+                    totalTime = 0;
+                    updateStats();
+                    saveToServer();
+                    textArea.focus();
+                }
+            });
+
+            // Functions
+            function startTimer() {
+                timerInterval = setInterval(function() {
+                    totalTime++;
+                    timeCount.textContent = totalTime;
+                }, 1000);
+            }
+
+            function resetTimer() {
+                // Clear existing countdown
+                clearTimeout(countdown);
+
+                // Reset timer
+                timeLeft = 5;
+                updateTimerDisplay();
+
+                // Start new countdown
+                countdown = setTimeout(function() {
+                    textArea.value = '';
+                    updateStats();
+                    saveToServer();
+                    alert('You stopped typing! All your progress has been lost.');
+                    resetTimer();
+                }, 5000);
+
+                // Update progress bar
+                progressBar.style.width = '100%';
+                progressBar.style.transition = 'width 5s linear';
+                setTimeout(function() {
+                    progressBar.style.width = '0%';
+                }, 10);
+            }
+
+            function updateTimerDisplay() {
+                timer.textContent = timeLeft;
+
+                // Update timer color based on time left
+                if (timeLeft > 3) {
+                    timer.className = 'timer';
+                } else if (timeLeft > 1) {
+                    timer.className = 'timer warning';
+                } else {
+                    timer.className = 'timer danger';
+                }
+
+                // Show warning message when time is running out
+                if (timeLeft <= 2) {
+                    warningMessage.classList.add('show');
+                }
+
+                // Decrement time left
+                if (timeLeft > 0) {
+                    setTimeout(function() {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    }, 1000);
+                }
+            }
+
+            function updateStats() {
+                const text = textArea.value;
+                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                const characters = text.length;
+
+                wordCount.textContent = words;
+                charCount.textContent = characters;
+            }
+
+            function saveToServer() {
+                const content = textArea.value;
+                if (content !== lastContent) {
+                    fetch("{{ url_for('save_content') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ content: content })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        lastContent = content;
+                    })
+                    .catch(error => {
+                        console.error('Error saving content:', error);
+                    });
+                }
+            }
+
+            function checkServerActivity() {
+                setInterval(function() {
+                    fetch("{{ url_for('check_activity') }}")
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.active && textArea.value !== '') {
+                            textArea.value = '';
+                            updateStats();
+                            alert('Server detected inactivity! All your progress has been lost.');
+                            resetTimer();
+                        } else if (data.content !== textArea.value) {
+                            textArea.value = data.content;
+                            updateStats();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking activity:', error);
+                    });
+                }, 1000);
+            }
+
+            // Focus on text area when page loads
+            textArea.focus();
+        });
+    </script>
+</body>
+</html>
