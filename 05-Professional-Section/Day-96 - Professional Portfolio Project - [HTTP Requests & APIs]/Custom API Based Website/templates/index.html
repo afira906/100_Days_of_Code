@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Potter Character Explorer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0e1a2b;
+            color: #c8b293;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #d3a625;
+            font-size: 2.5rem;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #5d5d5d;
+            border-radius: 4px 0 0 4px;
+            background-color: #1e2b3f;
+            color: #c8b293;
+        }
+        #search-button {
+            padding: 10px 20px;
+            background-color: #740001;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .character-card {
+            background-color: #1e2b3f;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .character-card:hover {
+            transform: translateY(-5px);
+        }
+        .character-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .character-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #d3a625;
+        }
+        .character-house {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .character-details {
+            display: none;
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #1e2b3f;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-button {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d3a625;
+        }
+        .loading {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Harry Potter Character Explorer</h1>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search for a character...">
+            <button id="search-button">Search</button>
+        </div>
+
+        <div id="characters-container" class="characters-grid">
+            <div class="loading">Loading characters...</div>
+        </div>
+    </div>
+
+    <div id="character-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="modal-character-details"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const charactersContainer = document.getElementById('characters-container');
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const modal = document.getElementById('character-modal');
+            const modalContent = document.getElementById('modal-character-details');
+            const closeButton = document.querySelector('.close-button');
+
+            // Fetch all characters on page load
+            fetch('/characters')
+                .then(response => response.json())
+                .then(characters => {
+                    displayCharacters(characters);
+                })
+                .catch(error => {
+                    charactersContainer.innerHTML = '<div class="error">Failed to load characters. Please try again later.</div>';
+                    console.error('Error:', error);
+                });
+
+            // Search functionality
+            searchButton.addEventListener('click', function() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    fetch(`/search?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(characters => {
+                            displayCharacters(characters);
+                        })
+                        .catch(error => {
+                            charactersContainer.innerHTML = '<div class="error">Search failed. Please try again.</div>';
+                            console.error('Error:', error);
+                        });
+                }
+            });
+
+            // Close modal when clicking the X
+            closeButton.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside the content
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            function displayCharacters(characters) {
+                if (characters.length === 0) {
+                    charactersContainer.innerHTML = '<div class="error">No characters found.</div>';
+                    return;
+                }
+
+                charactersContainer.innerHTML = '';
+
+                characters.forEach(character => {
+                    const card = document.createElement('div');
+                    card.className = 'character-card';
+
+                    const image = document.createElement('img');
+                    image.className = 'character-image';
+                    image.src = character.image || 'https://via.placeholder.com/250x200.png?text=No+Image';
+                    image.alt = character.name;
+
+                    const name = document.createElement('div');
+                    name.className = 'character-name';
+                    name.textContent = character.name;
+
+                    const house = document.createElement('div');
+                    house.className = 'character-house';
+                    house.textContent = character.house || 'House unknown';
+
+                    card.appendChild(image);
+                    card.appendChild(name);
+                    card.appendChild(house);
+
+                    card.addEventListener('click', function() {
+                        showCharacterDetails(character);
+                    });
+
+                    charactersContainer.appendChild(card);
+                });
+            }
+
+            function showCharacterDetails(character) {
+                modalContent.innerHTML = `
+                    <h2>${character.name}</h2>
+                    <img src="${character.image || 'https://via.placeholder.com/250x200.png?text=No+Image'}" alt="${character.name}" style="width: 100%; border-radius: 4px; margin-bottom: 15px;">
+                    <p><strong>House:</strong> ${character.house || 'Unknown'}</p>
+                    <p><strong>Ancestry:</strong> ${character.ancestry || 'Unknown'}</p>
+                    <p><strong>Patronus:</strong> ${character.patronus || 'Unknown'}</p>
+                    <p><strong>Wand:</strong> ${character.wand?.wood || 'Unknown'} wood, ${character.wand?.core || 'Unknown'} core, ${character.wand?.length || 'Unknown'} inches</p>
+                    <p><strong>Actor:</strong> ${character.actor || 'Unknown'}</p>
+                `;
+                modal.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>
