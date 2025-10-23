@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Checkout</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <img src="{{ item.product.image_url }}" class="img-fluid rounded" alt="{{ item.product.name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <h6>{{ item.product.name }}</h6>
+                            <p class="text-muted">Quantity: {{ item.quantity }}</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <p class="fw-bold">${{ "%.2f"|format(item.total) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="border-top pt-3">
+                        <h5 class="text-end">Total: ${{ "%.2f"|format(total) }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="payment-form">
+                        <div id="payment-element">
+                            <!-- Stripe Elements will create form elements here -->
+                        </div>
+                        <button id="submit" class="btn btn-primary w-100 mt-3">
+                            <span id="button-text">Pay now</span>
+                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        </button>
+                        <div id="payment-message" class="mt-3 text-danger"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const options = {
+        clientSecret: new URLSearchParams(window.location.search).get('payment_intent_client_secret'),
+    };
+
+    const elements = stripe.elements(options);
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+
+    const form = document.getElementById('payment-form');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const submitButton = document.getElementById('submit');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.getElementById('spinner');
+        const paymentMessage = document.getElementById('payment-message');
+
+        submitButton.disabled = true;
+        buttonText.classList.add('d-none');
+        spinner.classList.remove('d-none');
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: '{{ url_for("payment_success", _external=true) }}',
+            },
+        });
+
+        if (error) {
+            paymentMessage.textContent = error.message;
+            submitButton.disabled = false;
+            buttonText.classList.remove('d-none');
+            spinner.classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}

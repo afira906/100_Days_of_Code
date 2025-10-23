@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - E-Commerce Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="row mb-4 border-bottom pb-3">
+                        <div class="col-md-3">
+                            <img src="{{ item.product.image_url }}" class="img-fluid rounded" alt="{{ item.product.name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <h5>{{ item.product.name }}</h5>
+                            <p class="text-muted">{{ item.product.description[:100] }}...</p>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <p class="fw-bold">${{ "%.2f"|format(item.product.price) }}</p>
+                            <p>Quantity: {{ item.quantity }}</p>
+                            <p class="fw-bold">Total: ${{ "%.2f"|format(item.total) }}</p>
+                            <a href="{{ url_for('remove_from_cart', product_id=item.product.id) }}" class="btn btn-sm btn-danger">Remove</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <p class="card-text">Total: ${{ "%.2f"|format(total) }}</p>
+                    {% if 'user_id' in session %}
+                    <a href="{{ url_for('checkout') }}" class="btn btn-primary w-100">Proceed to Checkout</a>
+                    {% else %}
+                    <p class="text-danger">Please log in to checkout</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-primary w-100">Login to Checkout</a>
+                    {% endif %}
+                    <a href="{{ url_for('products') }}" class="btn btn-outline-secondary w-100 mt-2">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h3>Your cart is empty</h3>
+        <p>Start shopping to add items to your cart</p>
+        <a href="{{ url_for('products') }}" class="btn btn-primary">Browse Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
